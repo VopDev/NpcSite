@@ -52,6 +52,29 @@
             color: #999;
             font-size: 0.9em;
         }
+
+        .locations-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .locations-list.collapsed {
+            max-height: 24px;
+            overflow: hidden;
+        }
+
+        .expand-button {
+            background: none;
+            border: none;
+            color: #0066cc;
+            cursor: pointer;
+            padding: 5px 0;
+            font-size: 0.9em;
+        }
+
+        .expand-button:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -82,7 +105,6 @@
                 function displayNPCs(filteredNPCs) {
                     npcGrid.innerHTML = '';
                     
-                    // Group NPCs by name
                     const groupedNPCs = filteredNPCs.reduce((acc, npc) => {
                         if (!acc[npc.name]) {
                             acc[npc.name] = [];
@@ -91,12 +113,10 @@
                         return acc;
                     }, {});
 
-                    // Display grouped NPCs
                     Object.entries(groupedNPCs).forEach(([name, npcs]) => {
                         const card = document.createElement('div');
                         card.className = 'npc-card';
                         
-                        // Create locations list with sorted IDs
                         const locationsList = npcs
                             .sort((a, b) => parseInt(a.id) - parseInt(b.id))
                             .map(npc => {
@@ -106,16 +126,33 @@
                                 return `<li>ID ${npc.id}: ${locationText}</li>`;
                             }).join('');
 
+                        const showExpandButton = npcs.length > 1;
+                        
                         card.innerHTML = `
                             <h3>${name}</h3>
-                            <img src="https://runescape.wiki/images/${encodeURIComponent(name)}.png" 
+                            <img src="https://runescape.wiki/images/${encodeURIComponent(name.replace(/ /g, '_'))}.png" 
                                  onerror="this.style.display='none'" 
                                  alt="${name}"
                                  style="max-width: 100px;">
-                            <ul class="locations-list">
+                            <ul class="locations-list ${showExpandButton ? 'collapsed' : ''}">
                                 ${locationsList}
                             </ul>
+                            ${showExpandButton ? 
+                                `<button class="expand-button">Show all ${npcs.length} locations</button>` : 
+                                ''}
                         `;
+
+                        if (showExpandButton) {
+                            const button = card.querySelector('.expand-button');
+                            const list = card.querySelector('.locations-list');
+                            button.addEventListener('click', () => {
+                                list.classList.toggle('collapsed');
+                                button.textContent = list.classList.contains('collapsed') ? 
+                                    `Show all ${npcs.length} locations` : 
+                                    'Show less';
+                            });
+                        }
+
                         npcGrid.appendChild(card);
                     });
                 }
