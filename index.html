@@ -108,6 +108,10 @@
 
                         card.innerHTML = `
                             <h3>${name}</h3>
+                            <img src="https://runescape.wiki/images/${encodeURIComponent(name)}.png" 
+                                 onerror="this.style.display='none'" 
+                                 alt="${name}"
+                                 style="max-width: 100px;">
                             <ul class="locations-list">
                                 ${locationsList}
                             </ul>
