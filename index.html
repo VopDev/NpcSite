@@ -13,6 +13,16 @@
             background-color: #f5f5f5;
         }
 
+        /* Add these styles for links */
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
         .search-container {
             margin-bottom: 20px;
         }
@@ -81,7 +91,17 @@
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="Search NPCs...">
     </div>
+    <div class="instructions"></div>
+        <p>Instructions:</p>
+        <ul>
+            <li>Enter the name of the NPC you are looking for in the search bar above.</li>
+            <li>Click on the NPC's ID to view more details about the NPC. (Weirdgloop)</li>
+            <li>Click on the coordinates to view the location of the NPC on the map. (Mejrs)</li>
+        </ul>
+    </div>
+    <br>
     <div id="npcGrid" class="npc-grid"></div>
+    
 
     <script>
         // Fetch and process the JSON data
@@ -121,7 +141,7 @@
                             .sort((a, b) => parseInt(a.id) - parseInt(b.id))
                             .map(npc => {
                                 const locationText = npc.location.x !== null ? 
-                                    `(${npc.location.x}, ${npc.location.y}, ${npc.location.z})` :
+                                    `(<a href="https://mejrs.github.io/?m=-1&z=4&p=0&x=${npc.location.x}&y=${npc.location.y}" target="_blank">${npc.location.x}, ${npc.location.y}, ${npc.location.z}</a>)` :
                                     'Unknown';
                                 return `<li><a href="https://chisel.weirdgloop.org/structs_rs3/index.html?type=npcs&id=${npc.id}" target="_blank">ID ${npc.id}</a>: ${locationText}</li>`;
                             }).join('');
