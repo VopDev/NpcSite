@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPC Database</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 10px;
+            width: 300px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .npc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .npc-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .npc-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .location {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .npc-id {
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search NPCs...">
+    </div>
+    <div id="npcGrid" class="npc-grid"></div>
+
+    <script>
+        // Fetch and process the JSON data
+        fetch('./combined_npcs.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const npcGrid = document.getElementById('npcGrid');
+                const searchInput = document.getElementById('searchInput');
+                
+                // Convert the object into an array of NPCs
+                const npcs = Object.entries(data).map(([id, npc]) => ({
+                    id: id.replace('npcid=', ''),
+                    ...npc
+                }));
+
+                function displayNPCs(filteredNPCs) {
+                    npcGrid.innerHTML = '';
+                    
+                    // Group NPCs by name
+                    const groupedNPCs = filteredNPCs.reduce((acc, npc) => {
+                        if (!acc[npc.name]) {
+                            acc[npc.name] = [];
+                        }
+                        acc[npc.name].push(npc);
+                        return acc;
+                    }, {});
+
+                    // Display grouped NPCs
+                    Object.entries(groupedNPCs).forEach(([name, npcs]) => {
+                        const card = document.createElement('div');
+                        card.className = 'npc-card';
+                        
+                        // Create locations list with sorted IDs
+                        const locationsList = npcs
+                            .sort((a, b) => parseInt(a.id) - parseInt(b.id))
+                            .map(npc => {
+                                const locationText = npc.location.x !== null ? 
+                                    `(${npc.location.x}, ${npc.location.y}, ${npc.location.z})` :
+                                    'Unknown';
+                                return `<li>ID ${npc.id}: ${locationText}</li>`;
+                            }).join('');
+
+                        card.innerHTML = `
+                            <h3>${name}</h3>
+                            <ul class="locations-list">
+                                ${locationsList}
+                            </ul>
+                        `;
+                        npcGrid.appendChild(card);
+                    });
+                }
+
+                // Initial display
+                displayNPCs(npcs);
+
+                // Search functionality
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const filteredNPCs = npcs.filter(npc => 
+                        npc.name.toLowerCase().includes(searchTerm) ||
+                        npc.id.includes(searchTerm)
+                    );
+                    displayNPCs(filteredNPCs);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading NPC data:', error);
+                document.getElementById('npcGrid').innerHTML = 'Error loading NPC data';
+            });
+    </script>
+</body>
+</html> 
