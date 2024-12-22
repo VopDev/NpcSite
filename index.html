@@ -152,7 +152,7 @@
                             .sort((a, b) => parseInt(a.id) - parseInt(b.id))
                             .map(npc => {
                                 const locationText = npc.location.x !== null ? 
-                                    `(<a href="https://mejrs.github.io/?m=-1&z=4&p=0&x=${npc.location.x}&y=${npc.location.y}" target="_blank">${npc.location.x}, ${npc.location.y}, ${npc.location.z}</a>)` :
+                                    `(<a href="https://mejrs.github.io/?m=-1&z=4&p=0&x=${npc.location.x}&y=${npc.location.y}&npc=${encodeURIComponent(npc.name)}" target="_blank">${npc.location.x}, ${npc.location.y}, ${npc.location.z}</a>)` :
                                     'Unknown';
                                 return `<li><a href="https://chisel.weirdgloop.org/structs_rs3/index.html?type=npcs&id=${npc.id}" target="_blank">ID ${npc.id}</a>: ${locationText}</li>`;
                             }).join('');
